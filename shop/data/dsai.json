@@ -1,0 +1,147 @@
+{
+  "attempt_number": 6,
+  "event": {
+    "api_version": "2018-03-22",
+    "created_at": "2023-06-07T07:34:52Z",
+    "data": {
+      "id": "c3603f33-ab36-4f38-a01d-521e463d72b5",
+      "code": "R8M8P24K",
+      "name": "Payment",
+      "utxo": False,
+      "pricing": {
+        "dai": {
+          "amount": "23.830114773344937200 ",
+          "currency": "DAI"
+        },
+        "usdc": {
+          "amount": "23.828923",
+          "currency": "USDC"
+        },
+        "local": {
+          "amount": "100.00",
+          "currency": "PLN"
+        },
+        "pusdc": {
+          "amount": "23.828923",
+          "currency": "PUSDC"
+        },
+        "pweth": {
+          "amount": "0.012687342841340495",
+          "currency": "PWETH"
+        },
+        "tether": {
+          "a mount": "23.824039",
+          "currency": "USDT"
+        },
+        "bitcoin": {
+          "amount": "0.00088597",
+          "currency": "BTC"
+        },
+        "polygon": {
+          "amount": "29.678569000",
+          "currency": "PMATIC"
+        },
+        "dogecoin": {
+          "amount": "342.32040321",
+          "currency": "DOGE"
+        },
+        "ethereum": {
+          "amount": "0.012675000",
+          "cu rrency": "ETH"
+        },
+        "litecoin": {
+          "amount": "0.26379855",
+          "currency": "LTC"
+        },
+        "bitcoincash": {
+          "amount": "0.21044708",
+          "currency": "BCH"
+        }
+      },
+      "fee_rate": 0.01,
+      "logo_url": "",
+      "metadata": {
+        
+      },
+      "payments": [
+        
+      ],
+      "resource": "charge",
+      "timeline": [
+        {
+          "time": "2023-06-07T07: 34:51Z",
+          "status": "NEW"
+        }
+      ],
+      "addresses": {
+        "dai": "0x53236c1604c486ee4f2d48e3295f4564c6cab446",
+        "usdc": "0x53236c1604c486ee4f2d48e3295f4564c6cab446",
+        "pusdc": "0x53236c1604c486ee4f2d48e3295f4564c6cab446",
+        "pweth": "0x53236c1604c486ee4f2d48e3295f4564c6cab446",
+        " tether": "0x53236c1604c486ee4f2d48e3295f4564c6cab446",
+        "bitcoin": "37SSZHEufgDJy62EPEV5TyRz5ysqDnbajp",
+        "polygon": "0x53236c1604c486ee4f2d48e3295f4564c6cab446",
+        "dogecoin": "DLLr89BHaHDF5oZwbdMZTHpdEgPkVCVu2u",
+        "ethereum": "0x53236c1604c486ee4f2d48e3295f4564c6 cab446",
+        "litecoin": "M99mdU5zKMZcQWurDFBc9LfrG9YHTspfr4",
+        "bitcoincash": "qp855am0hepe8qlp0v65yx5kn367jvtr750zcr4kgh"
+      },
+      "pwcb_only": False,
+      "created_at": "2023-06-07T07:34:51Z",
+      "expires_at": "2023-06-07T08:34:51Z",
+      "hosted_url": "https://commerce.coinbase.co m/charges/R8M8P24K",
+      "brand_color": "#000000",
+      "description": "Payment",
+      "fees_settled": True,
+      "pricing_type": "fixed_price",
+      "support_email": "mironoff375@gmail.com",
+      "brand_logo_url": "",
+      "exchange_rates": {
+        "BCH-USD": "113.23",
+        "BTC-USD": "26895.72",
+        "DAI-US D": "0.99995",
+        "ETH-USD": "1879.97",
+        "LTC-USD": "90.33",
+        "DOGE-USD": "0.06961",
+        "USDC-USD": "1.0",
+        "USDT-USD": "1.000205",
+        "PUSDC-USD": "1.0",
+        "PWETH-USD": "1878.165",
+        "PMATIC-USD": "0.8029"
+      },
+      "offchain_eligible": False,
+      "organization_name": "",
+      "payment_thres hold": {
+        "overpayment_absolute_threshold": {
+          "amount": "10000.00",
+          "currency": "USD"
+        },
+        "overpayment_relative_threshold": "0.99",
+        "underpayment_absolute_threshold": {
+          "amount": "0.50",
+          "currency": "USD"
+        },
+        "underpayment_relative_threshold": "0.01"
+      },
+      "local_exchange _rates": {
+        "BCH-PLN": "475.18",
+        "BTC-PLN": "112870.06",
+        "DAI-PLN": "4.20",
+        "ETH-PLN": "7889.45",
+        "LTC-PLN": "379.08",
+        "DOGE-PLN": "0.29",
+        "USDC-PLN": "4.20",
+        "USDT-PLN": "4.20",
+        "PUSDC-PLN": "4.20",
+        "PWETH-PLN": "7881.87",
+        "PMATIC-PLN": "3.37"
+      },
+      "coinbase_managed_merchant": False
+    },
+    "id": "ebde84ab-c44e-4cea-9d99-6df7a5146ab1",
+    "resource": "event",
+    "type": "charge:created"
+  },
+  "id": "578fcb60-461e-4011-868f-867210fe5638",
+  "scheduled_for": "2023-06-07T07:43:11Z"
+}
