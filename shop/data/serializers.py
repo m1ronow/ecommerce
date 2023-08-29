@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser, UserAddress, UserProfile, Category, Product, Cart, CartItem, Order, OrderItem, \
-    Payment, ShippingMethod, Promo, PaymentMethod, FavoritesItem
+    Payment, ShippingMethod, Promo, PaymentMethod, FavoritesItem, PromoActivation
 from django.contrib.auth import authenticate
 
 
@@ -34,11 +34,18 @@ class LoginSerializer(serializers.Serializer):
 class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'url', 'email', 'name', 'password', 'date_joined', 'is_active', 'is_staff', 'is_superuser']
+        fields = ['id', 'url', 'email', 'password', 'date_joined', 'is_active', 'is_staff', 'is_superuser']
         extra_kwargs = {
             'password': {'write_only': True},
             'email': {'required': True},
         }
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = CustomUser
+
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
 
 
 class UserAddressSerializer(serializers.HyperlinkedModelSerializer):
@@ -173,8 +180,12 @@ class ShippingMethodSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PromoSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-
     class Meta:
         model = Promo
-        fields = '__all__'
+        fields = ['code', 'multiplier', 'quantity']
+
+
+class PromoActivationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = PromoActivation
+        fields = ['order', 'user', 'promo']

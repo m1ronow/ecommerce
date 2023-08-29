@@ -1,5 +1,4 @@
 from django.contrib.auth.models import PermissionsMixin, BaseUserManager, AbstractBaseUser
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -24,7 +23,6 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    name = models.CharField(max_length=150)
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -32,7 +30,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
 
     def __str__(self):
         return self.email
@@ -58,7 +55,8 @@ class UserAddress(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    phone = models.TextField(blank=True)
+    name = models.CharField(max_length=150, blank=True)
+    phone = models.CharField(blank=True)
     current_address = models.OneToOneField(UserAddress, null=True, on_delete=models.SET_NULL, blank=True)
 
     class Meta:
@@ -133,6 +131,7 @@ class Order(models.Model):
     )
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    uuid = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
@@ -141,15 +140,22 @@ class Order(models.Model):
     # calculated property - total amount to pay for an order
     @property
     def total_price(self):
-        # calculate the total price based on OrderItems
+        # calculates the total price based on OrderItems
         order_items = self.orderitem_set.all()
         subtotal = sum(item.product.price * item.quantity for item in order_items)
 
-        # add the price of the ShippingMethod if it exists
+        # check for existing promo activation
+        try:
+            promo_activation = PromoActivation.objects.get(order=self)
+            subtotal = float(subtotal) * (1 - promo_activation.promo.multiplier)
+        except PromoActivation.DoesNotExist:
+            pass  # no promo activation found
+
+        # adds the price of the ShippingMethod if it exists
         shipping_price = self.shipping_method.price if self.shipping_method else 0
 
-        # calculate the total price including the shipping price
-        total = subtotal + shipping_price
+        # calculates the total price including the shipping price
+        total = float(subtotal) + float(shipping_price)
 
         return total
 
@@ -183,7 +189,6 @@ class Payment(models.Model):
     )
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    uuid = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.ForeignKey(PaymentMethod, null=True, on_delete=models.SET_NULL)
     payment_id = models.CharField(max_length=150, blank=True, null=True)
@@ -198,8 +203,18 @@ class Payment(models.Model):
 
 
 class Promo(models.Model):
-    discount_code = models.CharField(max_length=50)
-    discount_multiplier = models.FloatField()
+    code = models.CharField(max_length=50, unique=True)
+    multiplier = models.FloatField()
+    quantity = models.IntegerField()
+
+    class Meta:
+        ordering = ['id']
+
+
+class PromoActivation(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
+    promo = models.ForeignKey(Promo, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['id']

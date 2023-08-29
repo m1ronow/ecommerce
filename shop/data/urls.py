@@ -6,7 +6,7 @@ router = routers.DefaultRouter()
 router.register(r'users', views.CustomUserViewSet)
 router.register(r'user_address', views.UserAddressViewSet)
 router.register(r'user_profile', views.UserProfileViewSet)
-router.register(r'products', views.ProductViewSet)
+router.register(r'products', views.ProductViewSet, basename='product')
 router.register(r'categories', views.CategoryViewSet)
 router.register(r'cart', views.CartViewSet)
 router.register(r'cart_items', views.CartItemViewSet)
@@ -17,6 +17,7 @@ router.register(r'payments', views.PaymentViewSet)
 router.register(r'shipping_methods', views.ShippingMethodViewSet)
 router.register(r'payment_methods', views.PaymentMethodViewSet)
 router.register(r'promo', views.PromoViewSet)
+router.register(r'promo_activations', views.PromoActivationViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

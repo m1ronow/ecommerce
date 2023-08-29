@@ -45,7 +45,7 @@ import { getUserData, logout } from "@/api/api";
 import { useAuthStore } from "@/stores/auth";
 
 const auth = useAuthStore();
-const user = ref<object>({});
+const user = ref<any>({});
 
 // need it because the trigger must have different name for each component instance
 const props = defineProps({

@@ -5,10 +5,13 @@
         <ion-icon :icon="receiptOutline" size="large"></ion-icon>
         <h1 class="page-title--fixed-margin">Checkout</h1>
       </ion-text>
-      <div v-if="!cartItems.length" class="checkout__epmty">
+
+      <UnauthenticatedMessage v-if="!auth.isLoggedIn"></UnauthenticatedMessage>
+
+      <div v-if="!cartItems.length && auth.isLoggedIn" class="checkout__epmty">
         Nothing to checkout
       </div>
-      <div v-if="cartItems.length" class="checkout">
+      <div v-if="cartItems.length && auth.isLoggedIn" class="checkout">
         <div class="checkout__details">
           <ion-card class="details__address">
             <ion-text>
@@ -73,6 +76,7 @@
                     type="text"
                     placeholder="Peter"
                     @keydown.enter="focusOnInput('lastName')"
+                    autocomplete="given-name"
                     class="address__input"
                   >
                   </ion-input>
@@ -92,6 +96,7 @@
                     type="text"
                     placeholder="Parker"
                     @keydown.enter="focusOnInput('company')"
+                    autocomplete="family-name"
                     class="address__input"
                   >
                   </ion-input>
@@ -110,6 +115,7 @@
                     type="text"
                     placeholder="Company Name"
                     @keydown.enter="focusOnInput('phone')"
+                    autocomplete="organization"
                     class="address__input"
                   >
                   </ion-input>
@@ -129,6 +135,7 @@
                     type="text"
                     placeholder="+1234567890"
                     @keydown.enter="focusOnInput('country')"
+                    autocomplete="tel"
                     class="address__input"
                   >
                   </ion-input>
@@ -148,6 +155,7 @@
                     type="text"
                     placeholder="Poland"
                     @keydown.enter="focusOnInput('postCode')"
+                    autocomplete="country-name"
                     class="address__input"
                   >
                   </ion-input>
@@ -167,6 +175,7 @@
                     type="text"
                     placeholder="12-345W"
                     @keydown.enter="focusOnInput('city')"
+                    autocomplete="postal-code"
                     class="address__input"
                   >
                   </ion-input>
@@ -186,6 +195,7 @@
                     type="text"
                     placeholder="Warsaw"
                     @keydown.enter="focusOnInput('address')"
+                    autocomplete="address-level2"
                     class="address__input"
                   >
                   </ion-input>
@@ -205,6 +215,7 @@
                     type="text"
                     placeholder="Bednarska 10/5"
                     @keydown.enter="handleAddressChange()"
+                    autocomplete="street-address"
                     class="address__input"
                   >
                   </ion-input>
@@ -219,7 +230,7 @@
                   type="submit"
                   color="dark"
                   expand="full"
-                  class="login__button"
+                  class="standart-button address__save-button"
                 >
                   Save
                 </ion-button>
@@ -278,16 +289,30 @@
             </div>
 
             <ion-input
-              label="Have a Promo Code?"
+              v-model="promoCode"
+              @ionBlur="checkPromo()"
+              :label="promoCodeData ? `You have ${(promoCodeData.multiplier*100).toFixed(0)}% discount!` : 'Have a Promo Code?'"
               placeholder="Enter Here!"
               label-placement="stacked"
               class="checkout-summary__promo"
+              :style="promoInputStyle"
             ></ion-input>
+            <div v-if="promoError" class="form-error">
+              <ion-icon :icon="alertCircleOutline" slot="start" color="danger" />
+              <div>
+                {{ promoError }}
+              </div>
+            </div>
 
             <div class="checkout-summary__summary-labels">
               <div class="checkout-summary__info-label ion-hide-lg-down">
                 <div>Subtotal</div>
                 <div>{{ totalCost() }} {{ currency }}</div>
+              </div>
+
+              <div v-if="promoCodeData" class="checkout-summary__info-label ion-hide-lg-down">
+                <div>Discount</div>
+                <div>{{ totalDiscount() }} {{ currency }}</div>
               </div>
 
               <div class="checkout-summary__info-label ion-hide-lg-down">
@@ -348,8 +373,9 @@ import {
   mailOutline,
   briefcaseOutline,
   homeOutline,
+alertCircleOutline,
 } from "ionicons/icons";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import {
   getCartItems,
   getUserProfile,
@@ -357,25 +383,50 @@ import {
   getPaymentMethods,
   createOrder,
   updateUserAddress,
+  checkPromoCode,
 } from "../api/api";
+import UnauthenticatedMessage from "@/components/UnauthenticatedMessage.vue";
 import { CartItems } from "../types/types";
+import { useAuthStore } from "@/stores/auth";
+
+const auth = useAuthStore();
 const cartItems = ref<Array<CartItems>>([]);
 const shippingMethods = ref<Array<any>>([]);
 const shippingValue = ref<number>(0);
 const paymentMethods = ref<Array<any>>([]);
 const paymentValue = ref<number>(0);
+const promoCode =  ref<string>('');
+const promoCodeOld =  ref<string>('');
+const promoCodeData =  ref<any>(null);
 const userProfile = ref<any>({});
 const isModalOpen = ref<boolean>(false);
 const addressData = ref<any>({});
+const promoError = ref<string>('');
 let currency = "";
+
+const promoInputStyle = computed(() => promoCodeData.value ? {'--color': 'var(--ion-color-success)'} : {})
 
 const totalCost = (): string => {
   let cost: number = 0;
   for (const element of cartItems.value) {
-    const priceConverted: number = +element.product.price;
+    let priceConverted: number = +element.product.price;
     cost += priceConverted * element.quantity;
   }
+  // calculates cost with a discount if promo code entered
+  if (promoCodeData.value) {
+    cost *= (1 - promoCodeData.value.multiplier);
+  }
   return cost.toFixed(2);
+};
+const totalDiscount = (): string => {
+  let cost: number = 0;
+  for (const element of cartItems.value) {
+    let priceConverted: number = +element.product.price;
+    cost += priceConverted * element.quantity;
+  }
+  const discountCost = cost * (1 - promoCodeData.value.multiplier);
+  const discount = 0 - (cost - discountCost); 
+  return discount.toFixed(2);
 };
 const toPayAmount = (): string => {
   const cost: number = +totalCost();
@@ -446,6 +497,7 @@ const newOrder = () => {
   const data = {
     shipping_method: shippingMethods.value[shippingValue.value].url,
     payment_method_id: paymentMethods.value[paymentValue.value].id,
+    promo_code: promoCode.value,
   };
 
   createOrder(data)
@@ -468,6 +520,23 @@ const handleAddressChange = () => {
     });
 };
 
+// this event fires when promo code input loses focus
+const checkPromo = () => {
+  promoError.value = '';
+  promoCodeData.value = null;
+  // make request only when value isn't empty and was changed
+  if (promoCode.value && promoCode.value !== promoCodeOld.value) {
+    checkPromoCode({promo: promoCode.value})
+      .then((response: any) => {
+        promoCodeData.value = response.data;
+      })
+      .catch((error: any) => {
+        promoError.value = error.response.data.error;
+      });
+  }
+  promoCodeOld.value = promoCode.value;
+}
+
 onIonViewDidEnter(() => {
   loadCartData();
   loadUserProfile();
@@ -477,6 +546,11 @@ onIonViewDidEnter(() => {
 </script>
 
 <style lang="scss">
+.checkout {
+  display: flex;
+  width: auto;
+}
+
 .checkout__details {
   display: flex;
   flex-direction: column;
@@ -484,11 +558,6 @@ onIonViewDidEnter(() => {
   flex-grow: 1;
   padding: 10px 8px 0px 8px;
   gap: 15px;
-}
-
-.checkout {
-  display: flex;
-  width: auto;
 }
 
 ion-card.details__address,
@@ -500,6 +569,11 @@ ion-card.details__payment {
 
 .details__button {
   height: 30px;
+  --border-radius: 0;
+}
+
+.address__save-button {
+  height: 40px;
   --border-radius: 0;
 }
 
@@ -549,7 +623,7 @@ ion-card.checkout-summary {
 .checkout-summary__promo {
   border-bottom: 1px solid lightgrey;
   min-height: 46px;
-  margin: 15px 0 20px 0;
+  margin: 15px 0 3px 0;
 }
 
 .checkout-summary__products {
@@ -567,6 +641,7 @@ ion-card.checkout-summary {
   display: flex;
   flex-direction: column;
   gap: 7px;
+  margin-top: 20px;
 }
 
 .checkout-summary__info-label {

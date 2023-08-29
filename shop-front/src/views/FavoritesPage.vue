@@ -9,14 +9,8 @@
         ></ion-icon>
         <h1 class="page-title--fixed-margin">Favorites</h1>
       </ion-text>
-      <div v-if="!auth.isLoggedIn" class="favorites-content__epmty">
-        Please,
-        <a @click="() => router.push('/login')" class="router-link">log in</a>
-        or
-        <a @click="() => router.push('/registration')" class="router-link"
-          >register</a
-        >
-      </div>
+      
+      <UnauthenticatedMessage v-if="!auth.isLoggedIn"></UnauthenticatedMessage>
 
       <div
         v-if="!favoriteItems.length && auth.isLoggedIn"
@@ -116,6 +110,7 @@ import {
   trashOutline,
 } from "ionicons/icons";
 import { ref } from "vue";
+import UnauthenticatedMessage from "@/components/UnauthenticatedMessage.vue";
 import {
   getFavoriteItems,
   deleteFavoriteItems,
@@ -188,6 +183,12 @@ onIonViewDidEnter(() => {
 .favorites-content__products {
   width: 70%;
   flex-grow: 1;
+}
+
+.favorites-content__epmty {
+  width: 100%;
+  text-align: center;
+  padding: 35px;
 }
 
 .product__price-details {
@@ -287,12 +288,6 @@ ion-card-header {
 
 .favorites-content__summary {
   width: 30%;
-}
-
-.favorites-content__epmty {
-  width: 100%;
-  text-align: center;
-  padding: 35px;
 }
 
 .router-link {

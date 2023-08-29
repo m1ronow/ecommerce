@@ -7,6 +7,7 @@
         type="email"
         placeholder="email@example.com"
         required
+        autocomplete="email"
         @keydown.enter="
           userData.password ? handleLogin() : focusOnInput('passwordInput')
         "
@@ -24,6 +25,7 @@
         type="password"
         placeholder="Password"
         required
+        autocomplete="current-password"
         @keydown.enter="
           userData.email ? handleLogin() : focusOnInput('emailInput')
         "

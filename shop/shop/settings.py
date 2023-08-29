@@ -24,25 +24,28 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a=k^wyhr5i@!diljfu&row^j6)s!zs(z65khsl69!q+j(w0p7u'
+SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['localhost', 'eb05-109-233-88-51.ngrok-free.app',]
+ALLOWED_HOSTS = [
+    'localhost',
+    'eb05-109-233-88-51.ngrok-free.app',
+]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8100',
     'https://eb05-109-233-88-51.ngrok-free.app',
 ]
+
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8100',
     'https://eb05-109-233-88-51.ngrok-free.app',
 ]
+
 CORS_ALLOW_CREDENTIALS = True
 
-RECAPTCHA_PUBLIC_KEY = '6LdO6yUmAAAAAMw1AnuEkKNDzZeT1KBQFTnnayA1'
-RECAPTCHA_PRIVATE_KEY = '6LdO6yUmAAAAAGLgz6Zz0miXC41JVSXIq7lkCyPo'
 
 # Application definition
 
@@ -50,7 +53,6 @@ INSTALLED_APPS = [
     'data',
     'rest_framework',
     'corsheaders',
-    'captcha',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -110,15 +112,11 @@ AUTH_USER_MODEL = "data.CustomUser"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        'NAME': 'shop',  # database name
-        'USER': 'postgres',
-        'PASSWORD': 'bdcrzg5q',
-        'HOST': 'localhost',
-        'PORT': '5434',
-        # "OPTIONS": {
-        #     "service": "my_service",
-        #     "passfile": ".my_pgpass",
-        # },
+        'NAME': env('PGSQL_DB_NAME'),  # database name
+        'USER': env('PGSQL_USER'),
+        'PASSWORD': env('PGSQL_PASSWORD'),
+        'HOST': env('PGSQL_HOST'),
+        'PORT': env('PGSQL_PORT'),
     }
 }
 

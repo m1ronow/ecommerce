@@ -7,61 +7,36 @@
       </ion-text>
       <template v-if="regStatus === 'pending'">
         <form class="reg-page__inputs" @submit.prevent="handleRegistration">
-          <ion-item class="reg-page__input-item" lines="none">
+          <ion-item class="input-item" lines="none">
             <ion-input
               v-model="userData.email"
               type="email"
               placeholder="email@example.com"
               @ionInput="handleInput('email')"
               @ionBlur="handleInput('email')"
+              autocomplete="email"
               required
-              class="reg-page__input"
+              class="basic-input"
             >
             </ion-input>
             <ion-icon
               :icon="mail"
               slot="start"
               :color="emailIconColor"
-              class="reg-page__input-icon"
+              class="input-icon"
             >
             </ion-icon>
+            <div slot="start" class="required-field"></div>
           </ion-item>
 
-          <div v-if="emailInvalidMessage" class="reg-page__form-error">
+          <div v-if="emailInvalidMessage" class="form-error">
             <ion-icon :icon="alertCircleOutline" slot="start" color="danger" />
             <div>
               {{ emailInvalidMessage }}
             </div>
           </div>
 
-          <ion-item class="reg-page__input-item" lines="none">
-            <ion-input
-              v-model="userData.name"
-              type="text"
-              placeholder="Peter Parker"
-              @ionInput="handleInput('name')"
-              @ionBlur="handleInput('name')"
-              required
-              class="reg-page__input"
-            >
-            </ion-input>
-            <ion-icon
-              :icon="personCircle"
-              slot="start"
-              :color="nameIconColor"
-              class="reg-page__input-icon"
-            >
-            </ion-icon>
-          </ion-item>
-
-          <div v-if="nameInvalidMessage" class="reg-page__form-error">
-            <ion-icon :icon="alertCircleOutline" slot="start" color="danger" />
-            <div>
-              {{ nameInvalidMessage }}
-            </div>
-          </div>
-
-          <ion-item class="reg-page__input-item" lines="none">
+          <ion-item class="input-item" lines="none">
             <ion-input
               v-model="userData.password"
               :clearOnEdit="false"
@@ -70,19 +45,20 @@
               @ionInput="handleInput('password')"
               @ionBlur="handleInput('password')"
               required
-              class="reg-page__input"
+              class="basic-input"
             >
             </ion-input>
             <ion-icon
               :icon="lockClosed"
               slot="start"
               :color="passwordIconColor"
-              class="reg-page__input-icon"
+              class="input-icon"
             >
             </ion-icon>
+            <div slot="start" class="required-field"></div>
           </ion-item>
 
-          <ion-item class="reg-page__input-item" lines="none">
+          <ion-item class="input-item" lines="none">
             <ion-input
               v-model="passwordRepeat"
               :clearOnEdit="false"
@@ -91,20 +67,21 @@
               @ionInput="handleInput('confirmPassword')"
               @ionBlur="handleInput('confirmPassword')"
               required
-              class="reg-page__input"
+              class="basic-input"
             >
             </ion-input>
             <ion-icon
               :icon="lockClosed"
               slot="start"
               :color="passwordIconColor"
-              class="reg-page__input-icon"
+              class="input-icon"
             >
             </ion-icon>
+            <div slot="start" class="required-field"></div>
           </ion-item>
 
           <template v-for="message in passwordInvalidMessage" :key="message">
-            <div class="reg-page__form-error">
+            <div class="form-error">
               <ion-icon
                 :icon="alertCircleOutline"
                 slot="start"
@@ -134,7 +111,7 @@
               >
             </div>
 
-            <div v-if="termsInvalidMessage" class="reg-page__form-error">
+            <div v-if="termsInvalidMessage" class="form-error">
               <ion-icon
                 :icon="alertCircleOutline"
                 slot="start"
@@ -230,9 +207,8 @@ const router = useIonRouter();
 
 const siteKey = "6LdO6yUmAAAAAMw1AnuEkKNDzZeT1KBQFTnnayA1";
 
-const userData = ref<RegUserData>({
+const userData = ref<any>({
   email: "",
-  name: "",
   password: "",
   captcha: "",
 });
@@ -249,7 +225,6 @@ const isTouchedFields = ref({
   password: false,
   confirmPassword: false,
   email: false,
-  name: false,
   terms: false,
 });
 
@@ -279,12 +254,6 @@ const isEmailValid = computed(
 const isEmailInvalid = computed(
   () => isTouchedFields.value.email && !emailMatch.value
 );
-const isNameValid = computed(
-  () => isTouchedFields.value.name && userData.value.name.length > 2
-);
-const isNameInvalid = computed(
-  () => isTouchedFields.value.name && userData.value.name.length < 3
-);
 const isTermsValid = computed(
   () => isTouchedFields.value.terms && termsChecked.value
 );
@@ -294,9 +263,6 @@ const isTermsInvalid = computed(
 
 const emailInvalidMessage = computed(() =>
   isEmailInvalid.value ? "Email is not valid." : null
-);
-const nameInvalidMessage = computed(() =>
-  isNameInvalid.value ? "Name is too short." : null
 );
 const passwordInvalidMessage = computed(() => {
   const errors: string[] = [];
@@ -340,7 +306,6 @@ const passwordIconColor = computed(() =>
 const emailIconColor = computed(() =>
   getIconColor(isEmailValid, isEmailInvalid)
 );
-const nameIconColor = computed(() => getIconColor(isNameValid, isNameInvalid));
 
 const checkEmailSyntax = (email: string) => {
   const emailRegex =
@@ -358,9 +323,6 @@ const handleInput = (fieldName: string) => {
       break;
     case "email":
       isTouchedFields.value.email = true;
-      break;
-    case "name":
-      isTouchedFields.value.name = true;
       break;
     case "terms":
       isTouchedFields.value.terms = true;
@@ -394,7 +356,6 @@ const handleRegistration = () => {
 
   if (
     isPasswordValid.value &&
-    isNameValid.value &&
     isEmailValid.value &&
     isTermsValid.value
   ) {
@@ -416,19 +377,13 @@ const handleRecaptchaResponse = () => {
     .then((response: any) => {
       if (response.data.hasOwnProperty("id")) {
         regStatus.value = "success";
+        auth.isLoggedIn = true;
       }
     })
     .catch((error: any) => {
       console.log(error);
     });
 };
-
-// if user logged in - redirect him to the main page
-watch(auth, () => {
-  if (auth.isLoggedIn) {
-    router.push("/");
-  }
-});
 </script>
 
 <style lang="scss">
@@ -447,30 +402,6 @@ watch(auth, () => {
   margin-top: 5px;
 }
 
-.reg-page__input-item {
-  border: 1px solid lightgrey;
-  margin: 0;
-  border-radius: 3px;
-}
-
-.reg-page__input-item::part(native) {
-  padding-left: 10px;
-}
-
-.reg-page__input-icon {
-  margin-right: 10px;
-}
-
-.reg-page__input {
-  margin: 0;
-  border-radius: 3px;
-  font-size: 15px;
-
-  .native-wrapper {
-    --border-width: 0;
-  }
-}
-
 .reg-page__reg-button {
   margin: 0;
 }
@@ -478,16 +409,6 @@ watch(auth, () => {
 .reg-page__login-button {
   margin-top: 25px;
   width: 100%;
-}
-
-.reg-page__form-error {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  min-height: 13px;
-  font-size: 13px;
-  color: var(--ion-color-danger);
-  gap: 2px;
 }
 
 .reg-page__terms-container {

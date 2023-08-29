@@ -11,7 +11,8 @@
   >
     <ion-list class="categories-list" lines="full">
       <ion-item
-        @click="() => router.push('/categories/' + category.id)"
+        class="categories__item"
+        @click="changeCategory(category.id)"
         v-for="category in props.categoriesList"
         button
         :detail="false"
@@ -34,16 +35,19 @@ import {
   useIonRouter,
 } from "@ionic/vue";
 import * as icon from "ionicons/icons";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+const router = useIonRouter();
 
 // type assertion to explicitly specify the type of the icon object
 // we create an IconObject interface that specifies an index signature for the icon object
 // we then assert the type of the icon object as IconObject using icon as IconObject
+// tf??????????????????
 interface IconObject {
   [key: string]: string;
 }
 const icons: IconObject = icon as IconObject;
-
-const router = useIonRouter();
 
 // need clickTrigger because the trigger must have different name for each component instance
 const props = defineProps<{
@@ -57,6 +61,10 @@ const props = defineProps<{
     description: string;
   }[];
 }>();
+
+function changeCategory(categoryId: number) {
+  router.push({ query: { ...route.query, category: categoryId } })
+}
 </script>
 
 <style lang="scss">
@@ -81,6 +89,10 @@ ion-button.button-category {
 
 ion-list.categories-list {
   padding: 0;
+}
+
+ion-item.categories__item {
+  --border-width: 0 !important;
 }
 
 div.toolbar-divider {

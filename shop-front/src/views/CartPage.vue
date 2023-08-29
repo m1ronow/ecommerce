@@ -9,14 +9,8 @@
         ></ion-icon>
         <h1 class="page-title--fixed-margin">My Cart</h1>
       </ion-text>
-      <div v-if="!auth.isLoggedIn" class="cart-content__epmty">
-        Please,
-        <a @click="() => router.push('/login')" class="router-link">log in</a>
-        or
-        <a @click="() => router.push('/registration')" class="router-link"
-          >register</a
-        >
-      </div>
+
+      <UnauthenticatedMessage v-if="!auth.isLoggedIn"></UnauthenticatedMessage>
 
       <div
         v-if="!cartItems.length && auth.isLoggedIn"
@@ -145,6 +139,7 @@ import {
   deleteCartItems,
   updateCartQuantity,
 } from "../api/api";
+import UnauthenticatedMessage from "@/components/UnauthenticatedMessage.vue";
 import { CartItems } from "../types/types";
 import { useAuthStore } from "@/stores/auth";
 
@@ -231,6 +226,12 @@ onIonViewDidEnter(() => {
 .cart-content__products {
   width: 70%;
   flex-grow: 1;
+}
+
+.cart-content__epmty {
+  width: 100%;
+  text-align: center;
+  padding: 35px;
 }
 
 .product__price-details {
@@ -379,12 +380,6 @@ ion-card.cart-summary {
 .cart-summary__divider {
   height: 1px;
   background-color: lightgrey;
-}
-
-.cart-content__epmty {
-  width: 100%;
-  text-align: center;
-  padding: 35px;
 }
 
 .router-link {

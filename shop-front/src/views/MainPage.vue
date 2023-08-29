@@ -1,23 +1,26 @@
 <template>
   <ion-page class="scrollbar-active" mode="ios">
-    <products-list :products="products" :currency="currency"></products-list>
+    <products-list 
+      :productsData="productsData"
+    >
+    </products-list>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { IonPage, onIonViewDidEnter } from "@ionic/vue";
 import ProductsList from "@/components/ProductsList.vue";
 import { getProducts } from "@/api/api";
+import { useListParamsStore } from "@/stores/list-params";
 
-const products = ref<Array<Product>>([]);
-let currency = "";
+let paramsStore = useListParamsStore();
+const productsData = ref<any>({});
 
-const loadProducts = () => {
-  getProducts()
+const loadProducts = (params: any = paramsStore.params) => {
+  getProducts(params)
     .then((response: any) => {
-      products.value = response.data.results.data;
-      currency = response.data.results.currency;
+      productsData.value = response.data;
     })
     .catch((error: any) => {
       console.log(error);
@@ -25,6 +28,11 @@ const loadProducts = () => {
 };
 
 onIonViewDidEnter(() => {
+  paramsStore = useListParamsStore();
   loadProducts();
 });
+
+watch(() => paramsStore.params, () => {
+  loadProducts(paramsStore.params)
+})
 </script>

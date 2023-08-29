@@ -45,6 +45,7 @@
 
             <ion-button
               @click="() => router.push('/favorites')"
+              router-link="/favorites"
               class="header-button ion-hide-sm-down"
               fill="clear"
               color="medium"
@@ -70,7 +71,7 @@
               click-trigger="navbar-trigger"
               :categories-list="categories"
             />
-            <ion-button> Button 1 </ion-button>
+            <ion-button @click="() => console.log(route.query)"> Button 1 </ion-button>
             <ion-button> Button 2 </ion-button>
             <ion-button> Button 3 </ion-button>
             <ion-button> Button 4 </ion-button>
@@ -100,7 +101,9 @@ import CategoryPopover from "./CategoryPopover.vue";
 import UserProfile from "./UserProfile.vue";
 import { ref } from "vue";
 import { getCategories } from "../api/api";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
 const router = useIonRouter();
 const categories = ref([]);
 

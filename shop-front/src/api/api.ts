@@ -1,4 +1,5 @@
 import axios from "axios";
+import { key } from "ionicons/icons";
 import Cookies from "js-cookie";
 
 const apiHost: string = "http://localhost:8000";
@@ -20,8 +21,19 @@ export const getCategoryProducts = async (categoryId: string) => {
   return await axios.get(`${apiHost}/products/filtered_by_category/${categoryId}`, authHeaders());
 };
 
-export const getProducts = async () => {
-  return await axios.get(`${apiHost}/products/`, authHeaders());
+export const getProducts = async (params: any = {}) => {
+  let paramsString = "";
+  
+  Object.keys(params).forEach((key: string) => {
+    if (params[key]) {
+      paramsString += `${key}=${params[key]}&`;
+    }
+  });
+  if (paramsString) {
+    paramsString = `?${paramsString.slice(0, -1)}`;
+  }
+
+  return await axios.get(`${apiHost}/products/${paramsString}`, authHeaders());
 };
 
 export const getCartItems = async () => {
@@ -60,6 +72,10 @@ export const getUserData = async () => {
   return await axios.get(`${apiHost}/users/me/`, authHeaders());
 };
 
+export const updateUserPassword = async (passwords: object) => {
+  return await axios.patch(`${apiHost}/users/update_password/`, passwords, authHeaders());
+};
+
 export const getUserProfile = async () => {
   return await axios.get(`${apiHost}/user_profile/me/`, authHeaders());
 };
@@ -78,6 +94,10 @@ export const getShippingMethods = async () => {
 
 export const getPaymentMethods = async () => {
   return await axios.get(`${apiHost}/payment_methods/`);
+};
+
+export const checkPromoCode = async (promo: object) => {
+  return await axios.post(`${apiHost}/promo/check/`, promo, authHeaders());
 };
 
 export const createOrder = async (orderData: object) => {
